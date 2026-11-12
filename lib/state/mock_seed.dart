@@ -7,7 +7,7 @@ List<Wallet> seedWallets() => const [
     id: 'w_cash',
     name: 'Cash',
     kind: WalletKind.cash,
-    initialBalance: 12000,
+    initialBalance: 50000,
   ),
   Wallet(
     id: 'w_ccp',
@@ -19,7 +19,7 @@ List<Wallet> seedWallets() => const [
     id: 'w_card',
     name: 'Bank Card',
     kind: WalletKind.card,
-    initialBalance: 20000,
+    initialBalance: 80000,
   ),
 ];
 

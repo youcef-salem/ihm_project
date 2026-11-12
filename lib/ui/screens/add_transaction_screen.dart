@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/categories.dart';
 import '../../core/format.dart';
 import '../../core/theme.dart';
+import '../../data/calculations/wallets.dart';
 import '../../data/models/transaction.dart';
 import '../../state/transactions_provider.dart';
 import '../../state/wallets_provider.dart';
@@ -67,13 +68,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     if (!_formKey.currentState!.validate() || _walletId == null) return;
     final amount = parseAmount(_amountCtrl.text)!;
     final balance = ref.read(walletBalancesProvider)[_walletId] ?? 0;
+    final shortfall = walletShortfall(balance, amount);
 
-    if (_type == TxType.expense && amount > balance) {
+    if (_type == TxType.expense && shortfall > 0) {
       final ok = await showDialog<bool>(
         context: context,
         builder: (c) => AlertDialog(
           title: const Text('Not enough balance'),
-          content: Text('This wallet only has ${money(balance)}. Save this expense anyway?'),
+          content: Text('This expense is ${money(shortfall)} more than the wallet balance (${money(balance)}). Save it anyway?'),
           actions: [
             TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Edit')),
             FilledButton(onPressed: () => Navigator.pop(c, true), child: const Text('Save anyway')),
@@ -105,10 +107,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     final wallets = ref.watch(walletsProvider);
     final balances = ref.watch(walletBalancesProvider);
     final scheme = Theme.of(context).colorScheme;
+    final isExpense = _type == TxType.expense;
     final amount = parseAmount(_amountCtrl.text);
     final balance = balances[_walletId] ?? 0;
-    final overdraw = _type == TxType.expense && amount != null && amount > balance;
-    final isExpense = _type == TxType.expense;
+    final shortfall = walletShortfall(balance, amount ?? 0);
+    final overdraw = isExpense && amount != null && amount > 0 && shortfall > 0;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Add transaction')),
@@ -170,7 +173,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'More than this wallet\'s balance (${money(balance)}).',
+                        'This expense is ${money(shortfall)} more than the wallet balance (${money(balance)}).',
                         style: TextStyle(color: scheme.onTertiaryContainer),
                       ),
                     ),

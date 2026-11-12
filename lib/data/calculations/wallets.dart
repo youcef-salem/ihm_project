@@ -18,3 +18,7 @@ Map<String, double> calculateWalletBalances(
 
 double calculateTotalBalance(Iterable<double> balances) =>
     balances.fold(0.0, (a, b) => a + b);
+
+/// Amount by which [amount] exceeds [balance] (0 when it fits).
+double walletShortfall(double balance, double amount) =>
+    amount > balance ? amount - balance : 0;

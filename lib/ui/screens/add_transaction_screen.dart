@@ -134,156 +134,168 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.addTransaction)),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(kPad),
-          children: [
-            SegmentedButton<TxType>(
-              segments: [
-                ButtonSegment(
-                  value: TxType.expense,
-                  label: Text(l10n.expense),
-                  icon: const Icon(Icons.arrow_upward),
-                ),
-                ButtonSegment(
-                  value: TxType.income,
-                  label: Text(l10n.income),
-                  icon: const Icon(Icons.arrow_downward),
-                ),
-              ],
-              selected: {_type},
-              onSelectionChanged: (s) => setState(() {
-                _type = s.first;
-                _categoryId = _categories.first.id;
-              }),
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: _amountCtrl,
-              autofocus: true,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
+      body: SafeArea(
+        top: false,
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(kPad),
+            children: [
+              SegmentedButton<TxType>(
+                segments: [
+                  ButtonSegment(
+                    value: TxType.expense,
+                    label: Text(l10n.expense),
+                    icon: const Icon(Icons.arrow_upward),
+                  ),
+                  ButtonSegment(
+                    value: TxType.income,
+                    label: Text(l10n.income),
+                    icon: const Icon(Icons.arrow_downward),
+                  ),
+                ],
+                selected: {_type},
+                onSelectionChanged: (s) => setState(() {
+                  _type = s.first;
+                  _categoryId = _categories.first.id;
+                }),
               ),
-              style: Theme.of(context).textTheme.headlineSmall,
-              decoration: InputDecoration(
-                labelText: l10n.amount,
-                suffixText: l10n.currency,
-                border: const OutlineInputBorder(),
-              ),
-              validator: (v) {
-                if (v == null || v.trim().isEmpty) return l10n.enterAmount;
-                final a = parseAmount(v);
-                if (a == null) return l10n.numbersOnly;
-                if (a <= 0) return l10n.amountPositive;
-                if (a > 100000000) return l10n.amountTooLarge;
-                return null;
-              },
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children: [
-                for (final v in const [500, 1000, 2000, 5000])
-                  ActionChip(label: Text('+$v'), onPressed: () => _addQuick(v)),
-              ],
-            ),
-            if (overdraw) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: scheme.tertiaryContainer,
-                  borderRadius: BorderRadius.circular(12),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _amountCtrl,
+                autofocus: true,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
                 ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, color: scheme.onTertiaryContainer),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        l10n.overdrawHint(
-                          context.money(shortfall),
-                          context.money(balance),
-                        ),
-                        style: TextStyle(color: scheme.onTertiaryContainer),
-                      ),
+                style: Theme.of(context).textTheme.headlineSmall,
+                decoration: InputDecoration(
+                  labelText: l10n.amount,
+                  suffixText: l10n.currency,
+                  border: const OutlineInputBorder(),
+                ),
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return l10n.enterAmount;
+                  final a = parseAmount(v);
+                  if (a == null) return l10n.numbersOnly;
+                  if (a <= 0) return l10n.amountPositive;
+                  if (a > 100000000) return l10n.amountTooLarge;
+                  return null;
+                },
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: [
+                  for (final v in const [500, 1000, 2000, 5000])
+                    ActionChip(
+                      label: Text('+$v'),
+                      onPressed: () => _addQuick(v),
                     ),
-                  ],
+                ],
+              ),
+              if (overdraw) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: scheme.tertiaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: scheme.onTertiaryContainer,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.overdrawHint(
+                            context.money(shortfall),
+                            context.money(balance),
+                          ),
+                          style: TextStyle(color: scheme.onTertiaryContainer),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+              ],
+              const SizedBox(height: 20),
+              Text(
+                l10n.category,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final c in _categories)
+                    ChoiceChip(
+                      avatar: Icon(c.icon, size: 18, color: c.color),
+                      label: Text(categoryName(l10n, c.id)),
+                      selected: _categoryId == c.id,
+                      onSelected: (_) => setState(() => _categoryId = c.id),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                isExpense ? l10n.paidFrom : l10n.receivedIn,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final w in wallets)
+                    ChoiceChip(
+                      label: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              context.walletName(w),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const Text(' · '),
+                          MoneyText(balances[w.id] ?? 0),
+                        ],
+                      ),
+                      selected: _walletId == w.id,
+                      onSelected: (_) => setState(() => _walletId = w.id),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _titleCtrl,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: InputDecoration(
+                  labelText: l10n.descriptionOptional,
+                  helperText: l10n.descriptionHelper,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.calendar_today_outlined),
+                title: Text(context.dateLabel(_date)),
+                subtitle: Text(l10n.tapToChangeDate),
+                onTap: _pickDate,
+              ),
+              const SizedBox(height: 12),
+              FilledButton.icon(
+                onPressed: _save,
+                icon: const Icon(Icons.check),
+                label: Text(isExpense ? l10n.saveExpense : l10n.saveIncome),
               ),
             ],
-            const SizedBox(height: 20),
-            Text(l10n.category, style: Theme.of(context).textTheme.titleSmall),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final c in _categories)
-                  ChoiceChip(
-                    avatar: Icon(c.icon, size: 18, color: c.color),
-                    label: Text(categoryName(l10n, c.id)),
-                    selected: _categoryId == c.id,
-                    onSelected: (_) => setState(() => _categoryId = c.id),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Text(
-              isExpense ? l10n.paidFrom : l10n.receivedIn,
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final w in wallets)
-                  ChoiceChip(
-                    label: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            context.walletName(w),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const Text(' · '),
-                        MoneyText(balances[w.id] ?? 0),
-                      ],
-                    ),
-                    selected: _walletId == w.id,
-                    onSelected: (_) => setState(() => _walletId = w.id),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: _titleCtrl,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(
-                labelText: l10n.descriptionOptional,
-                helperText: l10n.descriptionHelper,
-                border: const OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.calendar_today_outlined),
-              title: Text(context.dateLabel(_date)),
-              subtitle: Text(l10n.tapToChangeDate),
-              onTap: _pickDate,
-            ),
-            const SizedBox(height: 12),
-            FilledButton.icon(
-              onPressed: _save,
-              icon: const Icon(Icons.check),
-              label: Text(isExpense ? l10n.saveExpense : l10n.saveIncome),
-            ),
-          ],
+          ),
         ),
       ),
     );

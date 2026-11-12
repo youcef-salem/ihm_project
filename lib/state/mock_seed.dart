@@ -1,13 +1,27 @@
-// Temporary seed data. Replaced by the data layer later.
-import '../data/models/goal.dart';
+// In-memory seed data (no backend: everything lives in app state).
 import '../data/models/transaction.dart';
 import '../data/models/wallet.dart';
 
 List<Wallet> seedWallets() => const [
-      Wallet(id: 'w_cash', name: 'Cash', kind: WalletKind.cash, initialBalance: 12000),
-      Wallet(id: 'w_ccp', name: 'CCP Account', kind: WalletKind.bank, initialBalance: 55000),
-      Wallet(id: 'w_card', name: 'Bank Card', kind: WalletKind.card, initialBalance: 20000),
-    ];
+  Wallet(
+    id: 'w_cash',
+    name: 'Cash',
+    kind: WalletKind.cash,
+    initialBalance: 12000,
+  ),
+  Wallet(
+    id: 'w_ccp',
+    name: 'CCP Account',
+    kind: WalletKind.bank,
+    initialBalance: 55000,
+  ),
+  Wallet(
+    id: 'w_card',
+    name: 'Bank Card',
+    kind: WalletKind.card,
+    initialBalance: 20000,
+  ),
+];
 
 List<Transaction> seedTransactions() {
   final now = DateTime.now();
@@ -20,20 +34,26 @@ List<Transaction> seedTransactions() {
     int daysAgo, {
     TxType type = TxType.expense,
     String wallet = 'w_cash',
-  }) =>
-      Transaction(
-        id: 'seed_${n++}',
-        title: title,
-        amount: amount,
-        type: type,
-        categoryId: cat,
-        walletId: wallet,
-        date: base.subtract(Duration(days: daysAgo)),
-      );
+  }) => Transaction(
+    id: 'seed_${n++}',
+    title: title,
+    amount: amount,
+    type: type,
+    categoryId: cat,
+    walletId: wallet,
+    date: base.subtract(Duration(days: daysAgo)),
+  );
 
   final list = <Transaction>[
     t('Salary', 62000, 'salary', 9, type: TxType.income, wallet: 'w_ccp'),
-    t('Freelance logo', 15000, 'freelance', 5, type: TxType.income, wallet: 'w_card'),
+    t(
+      'Freelance logo',
+      15000,
+      'freelance',
+      5,
+      type: TxType.income,
+      wallet: 'w_card',
+    ),
     t('Salary', 62000, 'salary', 39, type: TxType.income, wallet: 'w_ccp'),
     t('Groceries', 4200, 'food', 1),
     t('Lunch', 900, 'food', 3),
@@ -55,24 +75,4 @@ List<Transaction> seedTransactions() {
   ];
   list.sort((a, b) => b.date.compareTo(a.date));
   return list;
-}
-
-List<Goal> seedGoals() {
-  final now = DateTime.now();
-  return [
-    Goal(
-      id: 'g1',
-      name: 'New laptop',
-      target: 120000,
-      saved: 45000,
-      deadline: DateTime(now.year, now.month + 6, 1),
-    ),
-    Goal(
-      id: 'g2',
-      name: 'Emergency fund',
-      target: 150000,
-      saved: 30000,
-      deadline: DateTime(now.year + 1, now.month, 1),
-    ),
-  ];
 }

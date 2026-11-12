@@ -5,7 +5,6 @@ const double kPad = 16.0;
 // Semantic colors, used the same way on every screen (consistency).
 const incomeColor = Color(0xFF2E9E5B);
 const expenseColor = Color(0xFFD64545);
-const warnColor = Color(0xFFE08A00);
 
 ThemeData buildTheme(Brightness brightness) {
   final scheme = ColorScheme.fromSeed(

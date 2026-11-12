@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme.dart';
-import '../../state/insights_provider.dart';
 import '../../state/nav_provider.dart';
 import '../../state/summary_provider.dart';
 import '../../state/transactions_provider.dart';
@@ -10,7 +9,6 @@ import '../../state/wallets_provider.dart';
 import '../widgets/balance_card.dart';
 import '../widgets/category_donut.dart';
 import '../widgets/empty_state.dart';
-import '../widgets/insight_card.dart';
 import '../widgets/section_header.dart';
 import '../widgets/transaction_tile.dart';
 
@@ -21,7 +19,6 @@ class DashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final total = ref.watch(totalBalanceProvider);
     final summary = ref.watch(monthSummaryProvider);
-    final insights = ref.watch(insightsProvider);
     final spent = ref.watch(monthExpensesByCategoryProvider);
     final txs = ref.watch(transactionsProvider);
     final names = {for (final w in ref.watch(walletsProvider)) w.id: w.name};
@@ -30,15 +27,6 @@ class DashboardScreen extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(kPad, kPad, kPad, 96),
       children: [
         BalanceCard(total: total, summary: summary),
-        if (insights.isNotEmpty) ...[
-          const SizedBox(height: 20),
-          const SectionHeader('Smart insights'),
-          for (final i in insights)
-            InsightCard(
-              insight: i,
-              onDismiss: () => ref.read(dismissedInsightsProvider.notifier).dismiss(i.id),
-            ),
-        ],
         const SizedBox(height: 20),
         const SectionHeader('Spending this month'),
         Card(

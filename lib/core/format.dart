@@ -1,4 +1,17 @@
-const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const _months = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
 
 /// 12500 -> "12 500 DA". With sign: true, positives get a "+".
 String money(num v, {bool sign = false}) {
@@ -22,8 +35,6 @@ String dateLabel(DateTime d) {
   if (diff == 1) return 'Yesterday';
   return '${d.day} ${_months[d.month - 1]} ${d.year}';
 }
-
-String monthYear(DateTime d) => '${_months[d.month - 1]} ${d.year}';
 
 double? parseAmount(String s) =>
     double.tryParse(s.trim().replaceAll(' ', '').replaceAll(',', '.'));

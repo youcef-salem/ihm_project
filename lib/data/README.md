@@ -1,10 +1,13 @@
 # data/
 
-TODO (later): repositories + data sources (local DB / API).
+Calculations and entities for EcoBudget. There is **no backend**: all data lives
+in app state (`lib/state/`), and this layer only computes values from it.
 
-- `models/`       plain entities used by `state/` and `ui/`
-- `repositories/` will expose the operations the Notifiers in `state/` currently do in memory
-- `sources/`      sqflite / Hive / REST clients
+- `models/`        plain entities used by `state/` and `ui/`
+- `calculations/`  pure functions/classes with the app logic
+  - `summary.dart`      month income/expense totals + expenses per category
+  - `wallets.dart`      balance per wallet + total across wallets
+  - `transactions.dart` search and type filtering
 
-Until then `state/mock_seed.dart` provides seed data. To plug the real data layer in,
-replace the seeds in each Notifier's `build()` and its mutating methods with repository calls.
+The Notifiers in `lib/state/` only hold mutable app state and delegate every
+calculation to the functions above.

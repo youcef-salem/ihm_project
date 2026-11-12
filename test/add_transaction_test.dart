@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:ihm_ui/l10n/generated/app_localizations.dart';
 import 'package:ihm_ui/ui/screens/add_transaction_screen.dart';
 
 void main() {
@@ -9,7 +10,13 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      const ProviderScope(child: MaterialApp(home: AddTransactionScreen())),
+      ProviderScope(
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const AddTransactionScreen(),
+        ),
+      ),
     );
 
     final amountField = find.byType(TextFormField).first;

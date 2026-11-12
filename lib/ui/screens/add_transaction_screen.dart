@@ -3,17 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/categories.dart';
 import '../../core/format.dart';
+import '../../core/l10n.dart';
 import '../../core/theme.dart';
 import '../../data/calculations/wallets.dart';
 import '../../data/models/transaction.dart';
 import '../../state/transactions_provider.dart';
 import '../../state/wallets_provider.dart';
+import '../widgets/money_text.dart';
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
   const AddTransactionScreen({super.key});
 
   @override
-  ConsumerState<AddTransactionScreen> createState() => _AddTransactionScreenState();
+  ConsumerState<AddTransactionScreen> createState() =>
+      _AddTransactionScreenState();
 }
 
 class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
@@ -66,6 +69,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate() || _walletId == null) return;
+    final l10n = context.l10n;
     final amount = parseAmount(_amountCtrl.text)!;
     final balance = ref.read(walletBalancesProvider)[_walletId] ?? 0;
     final shortfall = walletShortfall(balance, amount);
@@ -74,11 +78,19 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       final ok = await showDialog<bool>(
         context: context,
         builder: (c) => AlertDialog(
-          title: const Text('Not enough balance'),
-          content: Text('This expense is ${money(shortfall)} more than the wallet balance (${money(balance)}). Save it anyway?'),
+          title: Text(l10n.notEnoughBalance),
+          content: Text(
+            l10n.overdrawDialog(c.money(shortfall), c.money(balance)),
+          ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Edit')),
-            FilledButton(onPressed: () => Navigator.pop(c, true), child: const Text('Save anyway')),
+            TextButton(
+              onPressed: () => Navigator.pop(c, false),
+              child: Text(l10n.edit),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(c, true),
+              child: Text(l10n.saveAnyway),
+            ),
           ],
         ),
       );
@@ -86,24 +98,31 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     }
     if (!mounted) return;
 
-    final cat = categoryById(_categoryId);
-    final title = _titleCtrl.text.trim().isEmpty ? cat.name : _titleCtrl.text.trim();
-    ref.read(transactionsProvider.notifier).add(Transaction(
-          id: DateTime.now().microsecondsSinceEpoch.toString(),
-          title: title,
-          amount: amount,
-          type: _type,
-          categoryId: _categoryId,
-          walletId: _walletId!,
-          date: _date,
-        ));
+    final title = _titleCtrl.text.trim().isEmpty
+        ? categoryName(l10n, _categoryId)
+        : _titleCtrl.text.trim();
+    ref
+        .read(transactionsProvider.notifier)
+        .add(
+          Transaction(
+            id: DateTime.now().microsecondsSinceEpoch.toString(),
+            title: title,
+            amount: amount,
+            type: _type,
+            categoryId: _categoryId,
+            walletId: _walletId!,
+            date: _date,
+          ),
+        );
     final messenger = ScaffoldMessenger.of(context);
+    final saved = l10n.savedTransaction(title, context.money(amount));
     Navigator.of(context).pop();
-    messenger.showSnackBar(SnackBar(content: Text('Saved: $title · ${money(amount)}')));
+    messenger.showSnackBar(SnackBar(content: Text(saved)));
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final wallets = ref.watch(walletsProvider);
     final balances = ref.watch(walletBalancesProvider);
     final scheme = Theme.of(context).colorScheme;
@@ -114,16 +133,24 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     final overdraw = isExpense && amount != null && amount > 0 && shortfall > 0;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Add transaction')),
+      appBar: AppBar(title: Text(l10n.addTransaction)),
       body: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(kPad),
           children: [
             SegmentedButton<TxType>(
-              segments: const [
-                ButtonSegment(value: TxType.expense, label: Text('Expense'), icon: Icon(Icons.arrow_upward)),
-                ButtonSegment(value: TxType.income, label: Text('Income'), icon: Icon(Icons.arrow_downward)),
+              segments: [
+                ButtonSegment(
+                  value: TxType.expense,
+                  label: Text(l10n.expense),
+                  icon: const Icon(Icons.arrow_upward),
+                ),
+                ButtonSegment(
+                  value: TxType.income,
+                  label: Text(l10n.income),
+                  icon: const Icon(Icons.arrow_downward),
+                ),
               ],
               selected: {_type},
               onSelectionChanged: (s) => setState(() {
@@ -135,19 +162,21 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             TextFormField(
               controller: _amountCtrl,
               autofocus: true,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               style: Theme.of(context).textTheme.headlineSmall,
-              decoration: const InputDecoration(
-                labelText: 'Amount',
-                suffixText: 'DA',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.amount,
+                suffixText: l10n.currency,
+                border: const OutlineInputBorder(),
               ),
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'Enter an amount';
+                if (v == null || v.trim().isEmpty) return l10n.enterAmount;
                 final a = parseAmount(v);
-                if (a == null) return 'Use numbers only';
-                if (a <= 0) return 'Amount must be greater than 0';
-                if (a > 100000000) return 'This amount looks too large';
+                if (a == null) return l10n.numbersOnly;
+                if (a <= 0) return l10n.amountPositive;
+                if (a > 100000000) return l10n.amountTooLarge;
                 return null;
               },
             ),
@@ -173,7 +202,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'This expense is ${money(shortfall)} more than the wallet balance (${money(balance)}).',
+                        l10n.overdrawHint(
+                          context.money(shortfall),
+                          context.money(balance),
+                        ),
                         style: TextStyle(color: scheme.onTertiaryContainer),
                       ),
                     ),
@@ -182,7 +214,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               ),
             ],
             const SizedBox(height: 20),
-            Text('Category', style: Theme.of(context).textTheme.titleSmall),
+            Text(l10n.category, style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -191,14 +223,17 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 for (final c in _categories)
                   ChoiceChip(
                     avatar: Icon(c.icon, size: 18, color: c.color),
-                    label: Text(c.name),
+                    label: Text(categoryName(l10n, c.id)),
                     selected: _categoryId == c.id,
                     onSelected: (_) => setState(() => _categoryId = c.id),
                   ),
               ],
             ),
             const SizedBox(height: 20),
-            Text(isExpense ? 'Paid from' : 'Received in', style: Theme.of(context).textTheme.titleSmall),
+            Text(
+              isExpense ? l10n.paidFrom : l10n.receivedIn,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -206,7 +241,19 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               children: [
                 for (final w in wallets)
                   ChoiceChip(
-                    label: Text('${w.name} · ${money(balances[w.id] ?? 0)}'),
+                    label: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            context.walletName(w),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const Text(' · '),
+                        MoneyText(balances[w.id] ?? 0),
+                      ],
+                    ),
                     selected: _walletId == w.id,
                     onSelected: (_) => setState(() => _walletId = w.id),
                   ),
@@ -216,25 +263,25 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             TextFormField(
               controller: _titleCtrl,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                labelText: 'Description (optional)',
-                helperText: 'Left empty, the category name is used',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.descriptionOptional,
+                helperText: l10n.descriptionHelper,
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 12),
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.calendar_today_outlined),
-              title: Text(dateLabel(_date)),
-              subtitle: const Text('Tap to change the date'),
+              title: Text(context.dateLabel(_date)),
+              subtitle: Text(l10n.tapToChangeDate),
               onTap: _pickDate,
             ),
             const SizedBox(height: 12),
             FilledButton.icon(
               onPressed: _save,
               icon: const Icon(Icons.check),
-              label: Text(isExpense ? 'Save expense' : 'Save income'),
+              label: Text(isExpense ? l10n.saveExpense : l10n.saveIncome),
             ),
           ],
         ),

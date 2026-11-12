@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/format.dart';
+import '../../core/l10n.dart';
 import '../../core/theme.dart';
 import '../../core/wallet_kinds.dart';
 import '../../data/models/wallet.dart';
 import '../../state/wallets_provider.dart';
 import '../widgets/empty_state.dart';
+import '../widgets/money_text.dart';
 
 class WalletsScreen extends ConsumerWidget {
   const WalletsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final wallets = ref.watch(walletsProvider);
     final balances = ref.watch(walletBalancesProvider);
     final total = ref.watch(totalBalanceProvider);
@@ -28,12 +31,18 @@ class WalletsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Total across wallets',
-                    style: TextStyle(color: t.colorScheme.onPrimaryContainer)),
+                Text(
+                  l10n.totalAcrossWallets,
+                  style: TextStyle(color: t.colorScheme.onPrimaryContainer),
+                ),
                 const SizedBox(height: 4),
-                Text(money(total),
-                    style: t.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w800, color: t.colorScheme.onPrimaryContainer)),
+                MoneyText(
+                  total,
+                  style: t.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: t.colorScheme.onPrimaryContainer,
+                  ),
+                ),
               ],
             ),
           ),
@@ -41,7 +50,7 @@ class WalletsScreen extends ConsumerWidget {
         const SizedBox(height: 12),
         OutlinedButton.icon(
           icon: const Icon(Icons.add),
-          label: const Text('Add wallet'),
+          label: Text(l10n.addWallet),
           onPressed: () async {
             final w = await showDialog<Wallet>(
               context: context,
@@ -52,10 +61,10 @@ class WalletsScreen extends ConsumerWidget {
         ),
         const SizedBox(height: 12),
         if (wallets.isEmpty)
-          const EmptyState(
+          EmptyState(
             icon: Icons.account_balance_wallet_outlined,
-            title: 'No wallets yet',
-            message: 'Add cash, a CCP account or a card to start tracking.',
+            title: l10n.noWalletsTitle,
+            message: l10n.noWalletsMessage,
           )
         else
           for (final w in wallets)
@@ -64,12 +73,17 @@ class WalletsScreen extends ConsumerWidget {
               child: ListTile(
                 leading: CircleAvatar(
                   backgroundColor: t.colorScheme.secondaryContainer,
-                  child: Icon(walletKindIcon(w.kind), color: t.colorScheme.onSecondaryContainer),
+                  child: Icon(
+                    walletKindIcon(w.kind),
+                    color: t.colorScheme.onSecondaryContainer,
+                  ),
                 ),
-                title: Text(w.name),
-                subtitle: Text(walletKindLabel(w.kind)),
-                trailing: Text(money(balances[w.id] ?? 0),
-                    style: const TextStyle(fontWeight: FontWeight.w700)),
+                title: Text(context.walletName(w)),
+                subtitle: Text(walletKindLabel(l10n, w.kind)),
+                trailing: MoneyText(
+                  balances[w.id] ?? 0,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
               ),
             ),
       ],
@@ -99,11 +113,12 @@ class _NewWalletDialogState extends State<_NewWalletDialog> {
   }
 
   void _submit() {
+    final l10n = context.l10n;
     final name = _name.text.trim();
     final bal = parseAmount(_balance.text);
     setState(() {
-      _nameError = name.isEmpty ? 'Give your wallet a name' : null;
-      _balanceError = bal == null ? 'Use numbers only' : null;
+      _nameError = name.isEmpty ? l10n.giveWalletName : null;
+      _balanceError = bal == null ? l10n.numbersOnly : null;
     });
     if (_nameError != null || _balanceError != null) return;
     Navigator.pop(
@@ -119,8 +134,9 @@ class _NewWalletDialogState extends State<_NewWalletDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AlertDialog(
-      title: const Text('New wallet'),
+      title: Text(l10n.newWallet),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -130,14 +146,22 @@ class _NewWalletDialogState extends State<_NewWalletDialog> {
               controller: _name,
               autofocus: true,
               textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(labelText: 'Name', errorText: _nameError),
+              decoration: InputDecoration(
+                labelText: l10n.name,
+                errorText: _nameError,
+              ),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _balance,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: InputDecoration(
-                  labelText: 'Current balance', suffixText: 'DA', errorText: _balanceError),
+                labelText: l10n.currentBalance,
+                suffixText: l10n.currency,
+                errorText: _balanceError,
+              ),
             ),
             const SizedBox(height: 16),
             Wrap(
@@ -147,7 +171,7 @@ class _NewWalletDialogState extends State<_NewWalletDialog> {
                 for (final k in WalletKind.values)
                   ChoiceChip(
                     avatar: Icon(walletKindIcon(k), size: 18),
-                    label: Text(walletKindLabel(k)),
+                    label: Text(walletKindLabel(l10n, k)),
                     selected: _kind == k,
                     onSelected: (_) => setState(() => _kind = k),
                   ),
@@ -157,8 +181,11 @@ class _NewWalletDialogState extends State<_NewWalletDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-        FilledButton(onPressed: _submit, child: const Text('Add')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(onPressed: _submit, child: Text(l10n.add)),
       ],
     );
   }

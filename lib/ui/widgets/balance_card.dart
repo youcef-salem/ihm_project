@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../core/format.dart';
+import '../../core/l10n.dart';
 import '../../state/summary_provider.dart';
+import 'money_text.dart';
 
 class BalanceCard extends StatelessWidget {
   final double total;
@@ -10,6 +11,7 @@ class BalanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final s = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(20),
@@ -20,13 +22,20 @@ class BalanceCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Total balance', style: TextStyle(color: s.onPrimary.withAlpha(200))),
+          Text(
+            l10n.totalBalance,
+            style: TextStyle(color: s.onPrimary.withAlpha(200)),
+          ),
           const SizedBox(height: 4),
           FittedBox(
             fit: BoxFit.scaleDown,
-            child: Text(
-              money(total),
-              style: TextStyle(color: s.onPrimary, fontSize: 32, fontWeight: FontWeight.w800),
+            child: MoneyText(
+              total,
+              style: TextStyle(
+                color: s.onPrimary,
+                fontSize: 32,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -35,16 +44,16 @@ class BalanceCard extends StatelessWidget {
               Expanded(
                 child: _Pill(
                   icon: Icons.arrow_downward,
-                  label: 'Income this month',
-                  value: money(summary.income),
+                  label: l10n.incomeThisMonth,
+                  value: summary.income,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _Pill(
                   icon: Icons.arrow_upward,
-                  label: 'Spent this month',
-                  value: money(summary.expense),
+                  label: l10n.spentThisMonth,
+                  value: summary.expense,
                 ),
               ),
             ],
@@ -58,7 +67,7 @@ class BalanceCard extends StatelessWidget {
 class _Pill extends StatelessWidget {
   final IconData icon;
   final String label;
-  final String value;
+  final num value;
   const _Pill({required this.icon, required this.label, required this.value});
 
   @override
@@ -78,14 +87,24 @@ class _Pill extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 11, color: s.onPrimary.withAlpha(210))),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: s.onPrimary.withAlpha(210),
+                  ),
+                ),
                 FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: Text(value,
-                      style: TextStyle(fontWeight: FontWeight.w700, color: s.onPrimary)),
+                  child: MoneyText(
+                    value,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: s.onPrimary,
+                    ),
+                  ),
                 ),
               ],
             ),

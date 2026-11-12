@@ -3,8 +3,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../core/categories.dart';
-import '../../core/format.dart';
+import '../../core/l10n.dart';
 import 'empty_state.dart';
+import 'money_text.dart';
 
 /// Donut chart + legend (name and %, so meaning never relies on color alone).
 class CategoryDonut extends StatelessWidget {
@@ -13,15 +14,16 @@ class CategoryDonut extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final entries = data.entries.where((e) => e.value > 0).toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     final total = entries.fold(0.0, (s, e) => s + e.value);
 
     if (total == 0) {
-      return const EmptyState(
+      return EmptyState(
         icon: Icons.pie_chart_outline,
-        title: 'No expenses yet this month',
-        message: 'Add an expense to see where your money goes.',
+        title: l10n.noExpensesYetTitle,
+        message: l10n.noExpensesYetMessage,
       );
     }
 
@@ -36,10 +38,10 @@ class CategoryDonut extends StatelessWidget {
             children: [
               CustomPaint(
                 size: const Size(140, 140),
-                painter: _DonutPainter(
-                  [for (final e in entries) MapEntry(categoryById(e.key).color, e.value)],
-                  track,
-                ),
+                painter: _DonutPainter([
+                  for (final e in entries)
+                    MapEntry(categoryById(e.key).color, e.value),
+                ], track),
               ),
               SizedBox(
                 width: 84,
@@ -48,9 +50,14 @@ class CategoryDonut extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Spent', style: Theme.of(context).textTheme.labelSmall),
-                      Text(money(total),
-                          style: const TextStyle(fontWeight: FontWeight.w700)),
+                      Text(
+                        l10n.spent,
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
+                      MoneyText(
+                        total,
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
                     ],
                   ),
                 ),
@@ -77,8 +84,11 @@ class CategoryDonut extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: Text(categoryById(e.key).name,
-                            maxLines: 1, overflow: TextOverflow.ellipsis),
+                        child: Text(
+                          categoryName(l10n, e.key),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                       Text('${(e.value / total * 100).round()}%'),
                     ],

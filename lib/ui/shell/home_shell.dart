@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/l10n.dart';
 import '../../state/nav_provider.dart';
 import '../screens/add_transaction_screen.dart';
 import '../screens/dashboard_screen.dart';
@@ -11,17 +12,18 @@ import '../screens/wallets_screen.dart';
 class HomeShell extends ConsumerWidget {
   const HomeShell({super.key});
 
-  static const _titles = ['Home', 'Transactions', 'Wallets'];
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final index = ref.watch(tabIndexProvider);
+    final l10n = context.l10n;
+    final titles = [l10n.home, l10n.transactions, l10n.wallets];
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_titles[index]),
+        title: Text(titles[index]),
         actions: [
           IconButton(
-            tooltip: 'Settings',
+            tooltip: l10n.settings,
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => Navigator.of(
               context,
@@ -43,27 +45,27 @@ class HomeShell extends ConsumerWidget {
           context,
         ).push(MaterialPageRoute(builder: (_) => const AddTransactionScreen())),
         icon: const Icon(Icons.add),
-        label: const Text('Add'),
+        label: Text(l10n.addButton),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: index,
         onDestinationSelected: (i) =>
             ref.read(tabIndexProvider.notifier).state = i,
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Home',
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home),
+            label: l10n.home,
           ),
           NavigationDestination(
-            icon: Icon(Icons.receipt_long_outlined),
-            selectedIcon: Icon(Icons.receipt_long),
-            label: 'History',
+            icon: const Icon(Icons.receipt_long_outlined),
+            selectedIcon: const Icon(Icons.receipt_long),
+            label: l10n.history,
           ),
           NavigationDestination(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            selectedIcon: Icon(Icons.account_balance_wallet),
-            label: 'Wallets',
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+            selectedIcon: const Icon(Icons.account_balance_wallet),
+            label: l10n.wallets,
           ),
         ],
       ),

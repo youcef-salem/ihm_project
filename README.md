@@ -4,8 +4,9 @@ A new Flutter project.
 
 ## Localization
 
-The app supports English, French, and Arabic. All user-facing strings live in
-`lib/l10n/app_en.arb`, `lib/l10n/app_fr.arb`, and `lib/l10n/app_ar.arb`.
+The app supports English, French, and Arabic, and starts in French by default.
+All user-facing strings live in `lib/l10n/app_en.arb`,
+`lib/l10n/app_fr.arb`, and `lib/l10n/app_ar.arb`.
 Edit those files to change translations, then regenerate the bindings with:
 
 ```bash

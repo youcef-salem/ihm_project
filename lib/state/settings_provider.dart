@@ -6,7 +6,7 @@ class AppSettings {
   final Locale locale;
   const AppSettings({
     this.themeMode = ThemeMode.system,
-    this.locale = const Locale('en'),
+    this.locale = const Locale('fr'),
   });
 
   AppSettings copyWith({ThemeMode? themeMode, Locale? locale}) => AppSettings(

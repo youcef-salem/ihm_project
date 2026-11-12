@@ -1,4 +1,4 @@
-# ihm_ui
+# Mizaniya
 
 A new Flutter project.
 

@@ -12,17 +12,11 @@ class EcoBudgetApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
     return MaterialApp(
-      title: 'EcoBudget',
+      title: 'Mizaniya',
       debugShowCheckedModeBanner: false,
       theme: buildTheme(Brightness.light),
       darkTheme: buildTheme(Brightness.dark),
       themeMode: settings.themeMode,
-      // Adaptability: user-controlled text size applied app-wide.
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context)
-            .copyWith(textScaler: TextScaler.linear(settings.textScale)),
-        child: child!,
-      ),
       home: const HomeShell(),
     );
   }

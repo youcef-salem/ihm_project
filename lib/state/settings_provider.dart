@@ -3,13 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AppSettings {
   final ThemeMode themeMode;
-  final double textScale;
-  const AppSettings({this.themeMode = ThemeMode.system, this.textScale = 1.0});
+  const AppSettings({this.themeMode = ThemeMode.system});
 
-  AppSettings copyWith({ThemeMode? themeMode, double? textScale}) => AppSettings(
-        themeMode: themeMode ?? this.themeMode,
-        textScale: textScale ?? this.textScale,
-      );
+  AppSettings copyWith({ThemeMode? themeMode}) =>
+      AppSettings(themeMode: themeMode ?? this.themeMode);
 }
 
 class SettingsNotifier extends Notifier<AppSettings> {
@@ -17,7 +14,6 @@ class SettingsNotifier extends Notifier<AppSettings> {
   AppSettings build() => const AppSettings();
 
   void setThemeMode(ThemeMode m) => state = state.copyWith(themeMode: m);
-  void setTextScale(double s) => state = state.copyWith(textScale: s);
   void reset() => state = const AppSettings();
 }
 

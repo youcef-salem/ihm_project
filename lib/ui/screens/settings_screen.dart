@@ -30,22 +30,6 @@ class SettingsScreen extends ConsumerWidget {
             onSelectionChanged: (v) => notifier.setThemeMode(v.first),
           ),
           const SizedBox(height: 24),
-          Text('Text size · ${(s.textScale * 100).round()}%', style: t.textTheme.titleMedium),
-          Slider(
-            value: s.textScale,
-            min: 0.85,
-            max: 1.4,
-            divisions: 11,
-            label: '${(s.textScale * 100).round()}%',
-            onChanged: notifier.setTextScale,
-          ),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(kPad),
-              child: Text('Preview: Groceries  -4 200 DA', style: t.textTheme.bodyLarge),
-            ),
-          ),
-          const SizedBox(height: 24),
           OutlinedButton.icon(
             onPressed: notifier.reset,
             icon: const Icon(Icons.restore),

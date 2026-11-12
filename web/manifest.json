@@ -1,11 +1,11 @@
 {
-    "name": "ihm_ui",
-    "short_name": "ihm_ui",
+    "name": "Mizaniya",
+    "short_name": "Mizaniya",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#1D8D60",
+    "theme_color": "#1D8D60",
+    "description": "Mizaniya - a simple budget tracker.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

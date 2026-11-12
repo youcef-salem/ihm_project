@@ -1,6 +1,6 @@
 # data/
 
-Calculations and entities for EcoBudget. There is **no backend**: all data lives
+Calculations and entities for Mizaniya. There is **no backend**: all data lives
 in app state (`lib/state/`), and this layer only computes values from it.
 
 - `models/`        plain entities used by `state/` and `ui/`

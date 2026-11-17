@@ -5,6 +5,7 @@ import '../../core/categories.dart';
 import '../../core/format.dart';
 import '../../core/l10n.dart';
 import '../../core/theme.dart';
+import '../../data/calculations/unusual.dart';
 import '../../data/calculations/wallets.dart';
 import '../../data/models/transaction.dart';
 import '../../state/transactions_provider.dart';
@@ -101,18 +102,20 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     final title = _titleCtrl.text.trim().isEmpty
         ? categoryName(l10n, _categoryId)
         : _titleCtrl.text.trim();
+    final candidate = Transaction(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      title: title,
+      amount: amount,
+      type: _type,
+      categoryId: _categoryId,
+      walletId: _walletId!,
+      date: _date,
+    );
+    final history = ref.read(transactionsProvider);
     ref
         .read(transactionsProvider.notifier)
         .add(
-          Transaction(
-            id: DateTime.now().microsecondsSinceEpoch.toString(),
-            title: title,
-            amount: amount,
-            type: _type,
-            categoryId: _categoryId,
-            walletId: _walletId!,
-            date: _date,
-          ),
+          candidate.copyWith(isUnusual: isUnusualExpense(history, candidate)),
         );
     final messenger = ScaffoldMessenger.of(context);
     final saved = l10n.savedTransaction(title, context.money(amount));

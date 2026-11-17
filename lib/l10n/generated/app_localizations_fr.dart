@@ -285,4 +285,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get categoryOtherIncome => 'Autre revenu';
+
+  @override
+  String get unusualExpenseThisMonth => 'Dépenses inhabituelles ce mois-ci';
+
+  @override
+  String get unusualExpenseSubtitle =>
+      'Au-dessus de votre moyenne dans la catégorie';
+
+  @override
+  String get unusualExpenseFlag => 'Inhabituelle';
 }

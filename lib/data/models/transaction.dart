@@ -9,6 +9,10 @@ class Transaction {
   final String walletId;
   final DateTime date;
 
+  /// Set once at entry time: this expense was flagged as unusually large
+  /// compared to the user's average for its category. Never recomputed.
+  final bool isUnusual;
+
   const Transaction({
     required this.id,
     required this.title,
@@ -17,5 +21,17 @@ class Transaction {
     required this.categoryId,
     required this.walletId,
     required this.date,
+    this.isUnusual = false,
   });
+
+  Transaction copyWith({bool? isUnusual}) => Transaction(
+    id: id,
+    title: title,
+    amount: amount,
+    type: type,
+    categoryId: categoryId,
+    walletId: walletId,
+    date: date,
+    isUnusual: isUnusual ?? this.isUnusual,
+  );
 }

@@ -20,6 +20,7 @@ class TransactionTile extends StatelessWidget {
     final l10n = context.l10n;
     final cat = categoryById(tx.categoryId);
     final isIncome = tx.type == TxType.income;
+    final scheme = Theme.of(context).colorScheme;
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: cat.color.withAlpha(40),
@@ -28,13 +29,29 @@ class TransactionTile extends StatelessWidget {
       title: Text(tx.title, maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: Text('${categoryName(l10n, tx.categoryId)} · $walletName'),
       // Sign + color: never color alone.
-      trailing: MoneyText(
-        isIncome ? tx.amount : -tx.amount,
-        sign: true,
-        style: TextStyle(
-          fontWeight: FontWeight.w700,
-          color: isIncome ? incomeColor : expenseColor,
-        ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (tx.isUnusual) ...[
+            Tooltip(
+              message: l10n.unusualExpenseFlag,
+              child: Icon(
+                Icons.flag_outlined,
+                size: 18,
+                color: scheme.tertiary,
+              ),
+            ),
+            const SizedBox(width: 6),
+          ],
+          MoneyText(
+            isIncome ? tx.amount : -tx.amount,
+            sign: true,
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              color: isIncome ? incomeColor : expenseColor,
+            ),
+          ),
+        ],
       ),
     );
   }

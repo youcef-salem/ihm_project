@@ -110,5 +110,8 @@
   "categorySalary": "Salary",
   "categoryFreelance": "Freelance",
   "categoryGift": "Gift",
-  "categoryOtherIncome": "Other income"
+  "categoryOtherIncome": "Other income",
+  "unusualExpenseThisMonth": "Unusual expenses this month",
+  "unusualExpenseSubtitle": "Above your average for the category",
+  "unusualExpenseFlag": "Unusual"
 }

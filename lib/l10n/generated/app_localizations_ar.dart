@@ -280,4 +280,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get categoryOtherIncome => 'دخل آخر';
+
+  @override
+  String get unusualExpenseThisMonth => 'مصروفات غير معتادة هذا الشهر';
+
+  @override
+  String get unusualExpenseSubtitle => 'أعلى من متوسطك في الفئة';
+
+  @override
+  String get unusualExpenseFlag => 'غير عادية';
 }

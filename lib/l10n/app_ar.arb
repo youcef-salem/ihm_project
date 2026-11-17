@@ -110,5 +110,8 @@
   "categorySalary": "راتب",
   "categoryFreelance": "عمل حر",
   "categoryGift": "هدية",
-  "categoryOtherIncome": "دخل آخر"
+  "categoryOtherIncome": "دخل آخر",
+  "unusualExpenseThisMonth": "مصروفات غير معتادة هذا الشهر",
+  "unusualExpenseSubtitle": "أعلى من متوسطك في الفئة",
+  "unusualExpenseFlag": "غير عادية"
 }

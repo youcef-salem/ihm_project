@@ -627,6 +627,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Other income'**
   String get categoryOtherIncome;
+
+  /// No description provided for @unusualExpenseThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Unusual expenses this month'**
+  String get unusualExpenseThisMonth;
+
+  /// No description provided for @unusualExpenseSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Above your average for the category'**
+  String get unusualExpenseSubtitle;
+
+  /// No description provided for @unusualExpenseFlag.
+  ///
+  /// In en, this message translates to:
+  /// **'Unusual'**
+  String get unusualExpenseFlag;
 }
 
 class _AppLocalizationsDelegate
